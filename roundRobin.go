@@ -1,7 +1,6 @@
 package gogetter
 
 import (
-	"log"
 	"net/http"
 	"sync"
 )
@@ -15,7 +14,6 @@ type RoundRobin struct {
 
 // Get responds to the Get method by invoking all specified Getters in round-robin fashion.
 func (g *RoundRobin) Get(url string) (*http.Response, error) {
-	log.Printf("RoundRobin.Get") // DEBUG
 	g.indexLock.Lock()
 	index := g.index
 	g.index++

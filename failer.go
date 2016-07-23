@@ -2,7 +2,6 @@ package gogetter
 
 import (
 	"fmt"
-	"log"
 	"math/rand"
 	"net/http"
 )
@@ -17,7 +16,6 @@ type Failer struct {
 
 // Get periodically responds to the Get method, and periodically fails.
 func (f *Failer) Get(url string) (*http.Response, error) {
-	log.Printf("Failer.Get") // DEBUG
 	if rand.Float64() < f.Frequency {
 		return nil, fmt.Errorf("random error")
 	}
