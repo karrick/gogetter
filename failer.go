@@ -10,8 +10,8 @@ import (
 //
 // WARNING: Don't use this in production code.
 type Failer struct {
-	Getter    Getter
-	Frequency float64
+	Getter    Getter  // Getter's Get method is invoked when the Failer instance doesn't fail.
+	Frequency float64 // Frequency specifies how often a failure should occur. Set to 0.0 to never fail and 1.0 to always fail.
 }
 
 // Get periodically responds to the Get method, and periodically fails.

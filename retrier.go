@@ -8,8 +8,8 @@ import "net/http"
 // server over and over.
 type Retrier struct {
 	Getter        Getter
-	RetryCount    int
-	RetryCallback func(error) bool // true means retry query based on specified error
+	RetryCount    int              // RetryCount is number of query retries to be issued if query returns error. Leave 0 to never retry query errors. But if you don't want to retry errors, It's best not to use a Retrier...
+	RetryCallback func(error) bool // RetryCallback is predicate function that tests whether query should be retried for a given error. Leave nil to retry all errors.
 }
 
 // Get attempts the specified query, and optionally retries a specified number of times, based on

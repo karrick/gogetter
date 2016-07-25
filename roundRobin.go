@@ -20,6 +20,6 @@ func (g *RoundRobin) Get(url string) (*http.Response, error) {
 	if g.index == uint64(len(g.Getters)) {
 		g.index = 0
 	}
-	g.indexLock.Unlock()
+	g.indexLock.Unlock() // NOTE: indexLock is not unlocked using defer because the Get invocation below can take quite a bit of time.
 	return g.Getters[index].Get(url)
 }
