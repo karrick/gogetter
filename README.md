@@ -27,12 +27,12 @@ and provide a request timeout.
 ```Go
     // convert remote address to Getter
     func addr2getter(addr string) gogetter.Getter {
-    	return &http.Client{
-    		Transport: &http.Transport{
-    			MaxIdleConnsPerHost: int(maxConns),
-    		},
-    		Timeout: time.Duration(timeout),
-    	}
+        return &http.Client{
+            Transport: &http.Transport{
+                MaxIdleConnsPerHost: int(maxConns),
+            },
+            Timeout: time.Duration(timeout),
+        }
     }
 ```
 
@@ -48,16 +48,16 @@ configured as your appliction requires.
 ```Go
     // convert remote address to Getter
     func addr2getter(addr string) gogetter.Getter {
-    	return &gogetter.Prefixer{
-    		Prefix: fmt.Sprintf("http://%s/some/resource/route?", addr),
-    		// NOTE: customize http.Client as desired:
-    		Getter: &http.Client{
-    			Transport: &http.Transport{
-    				MaxIdleConnsPerHost: int(maxConns),
-    			},
-    			Timeout: time.Duration(timeout),
-    		},
-    	}
+        return &gogetter.Prefixer{
+            Prefix: fmt.Sprintf("http://%s/some/resource/route?", addr),
+            // NOTE: customize http.Client as desired:
+            Getter: &http.Client{
+                Transport: &http.Transport{
+                    MaxIdleConnsPerHost: int(maxConns),
+                },
+                Timeout: time.Duration(timeout),
+            },
+        }
     }
 ```
 
@@ -72,19 +72,19 @@ send successive Get invocations to different underlying http.Client instances.
         if len(hostnames) == 0 {
             return nil, fmt.Errorf("cannot create Getter without at least one server address")
         }
-    
+
         var getter gogetter.Getter
-        
-    	if len(hostnames) == 1 {
-    		getter = addr2getter(hostnames[0])
-    	} else {
-    		rr := &gogetter.RoundRobin{}
-    		for _, hostname := range hostnames {
-    			rr.Getters = append(rr.Getters, addr2getter(hostname))
-    		}
-    		getter = rr
-    	}
-    
+
+        if len(hostnames) == 1 {
+            getter = addr2getter(hostnames[0])
+        } else {
+            var hostGetters []gogetter.Getter
+            for _, addr := range addrs {
+                hostGetters = append(hostGetters, addr)
+            }
+            hg = gogetter.NewRoundRobin(hostGetters)
+        }
+
         return getter, nil
     }
 ```
@@ -99,17 +99,17 @@ retry business logic into a function, and this library will retry those errors f
 ```Go
     func addrs2getter() {
         // (as above)
-    
-    	// set 'retryCount' to a positive number if you'd like to retry on errors; set it to 0 to
-    	// send queries only once
-    	retryCount := 10
-    	if retryCount > 0 {
-    		getter = &gogetter.Retrier{
-    			Getter:     getter,
-    			RetryCount: retryCount,
-    		}
-    	}
-    
+
+        // set 'retryCount' to a positive number if you'd like to retry on errors; set it to 0 to
+        // send queries only once
+        retryCount := 10
+        if retryCount > 0 {
+            getter = &gogetter.Retrier{
+                Getter:     getter,
+                RetryCount: retryCount,
+            }
+        }
+
         return getter, nil
     }
 ```
