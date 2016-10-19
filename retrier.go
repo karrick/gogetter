@@ -18,6 +18,7 @@ func (r *Retrier) Get(url string) (response *http.Response, err error) {
 	// NOTE: condition is less than or equal to ensure it runs once _plus_ retry count
 	for count := 0; count <= r.RetryCount; count++ {
 		response, err = r.Getter.Get(url)
+		// TODO: don't bother calling RetryCallback if no retries left
 		if err == nil || (r.RetryCallback != nil && !r.RetryCallback(err)) {
 			return
 		}
