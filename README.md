@@ -28,10 +28,10 @@ and provide a request timeout.
     // convert remote address to Getter
     func addr2getter(addr string) gogetter.Getter {
         return &http.Client{
+            Timeout: time.Duration(timeout),
             Transport: &http.Transport{
                 MaxIdleConnsPerHost: int(maxConns),
             },
-            Timeout: time.Duration(timeout),
         }
     }
 ```
@@ -52,10 +52,10 @@ configured as your appliction requires.
             Prefix: fmt.Sprintf("http://%s/some/resource/route?", addr),
             // NOTE: customize http.Client as desired:
             Getter: &http.Client{
+                Timeout: time.Duration(timeout),
                 Transport: &http.Transport{
                     MaxIdleConnsPerHost: int(maxConns),
                 },
-                Timeout: time.Duration(timeout),
             },
         }
     }
