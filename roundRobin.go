@@ -14,9 +14,9 @@ type roundRobin struct {
 func NewRoundRobin(getters []Getter) Getter {
 	r := ring.New(len(getters))
 
-	// log.Printf("servers: %v\n", getters)
-	for i := 0; i < len(getters); i++ {
-		r.Next().Value = getters[i]
+	for _, getter := range getters {
+		r = r.Next()
+		r.Value = getter
 	}
 
 	return &roundRobin{r: r}
@@ -24,5 +24,7 @@ func NewRoundRobin(getters []Getter) Getter {
 
 // Get responds to the Get method by invoking all specified Getters in round-robin fashion.
 func (g *roundRobin) Get(url string) (*http.Response, error) {
-	return g.r.Next().Value.(Getter).Get(url)
+	next := g.r.Next()
+	g.r = next
+	return next.Value.(Getter).Get(url)
 }

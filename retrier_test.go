@@ -1,31 +1,14 @@
 package gogetter_test
 
 import (
-	"errors"
-	"net/http"
 	"testing"
 
 	"github.com/karrick/gogetter"
 )
 
-type mockRetrier struct {
-	failuresRemaining int
-	invokedCounter    int
-}
-
-func (g *mockRetrier) Get(url string) (*http.Response, error) {
-	g.invokedCounter++
-
-	g.failuresRemaining--
-	if g.failuresRemaining >= 0 {
-		return nil, errors.New("intentional error")
-	}
-	return nil, nil
-}
-
 func TestRetrierZeroRetriesMakesOnlyOneAttempt(t *testing.T) {
 	var retryCalbackInvocationCounter int
-	getter := &mockRetrier{failuresRemaining: 10}
+	getter := &mockGetter{failuresRemaining: 10}
 	retrier := &gogetter.Retrier{
 		Getter:     getter,
 		RetryCount: 0, // want max of 1 attempt
@@ -47,7 +30,7 @@ func TestRetrierZeroRetriesMakesOnlyOneAttempt(t *testing.T) {
 
 func TestRetrierOnlyInvokesCallbackWhenMoreRetriesLeft(t *testing.T) {
 	var retryCalbackInvocationCounter int
-	getter := &mockRetrier{failuresRemaining: 10}
+	getter := &mockGetter{failuresRemaining: 10}
 	retrier := &gogetter.Retrier{
 		Getter:     getter,
 		RetryCount: 2, // want max of 3 attempts
@@ -69,7 +52,7 @@ func TestRetrierOnlyInvokesCallbackWhenMoreRetriesLeft(t *testing.T) {
 
 func TestRetrierOnlyRetriesWhenCallbackReturnsTrue(t *testing.T) {
 	var retryCalbackInvocationCounter int
-	getter := &mockRetrier{failuresRemaining: 10}
+	getter := &mockGetter{failuresRemaining: 10}
 	retrier := &gogetter.Retrier{
 		Getter:     getter,
 		RetryCount: 2, // want max of 3 attempts
@@ -91,7 +74,7 @@ func TestRetrierOnlyRetriesWhenCallbackReturnsTrue(t *testing.T) {
 
 func TestRetrierEventualSuccess(t *testing.T) {
 	var retryCalbackInvocationCounter int
-	getter := &mockRetrier{failuresRemaining: 2}
+	getter := &mockGetter{failuresRemaining: 2}
 	retrier := &gogetter.Retrier{
 		Getter:     getter,
 		RetryCount: 4, // want max of 5 attempts
