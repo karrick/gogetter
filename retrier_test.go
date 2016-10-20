@@ -2,6 +2,7 @@ package gogetter_test
 
 import (
 	"testing"
+	"time"
 
 	"github.com/karrick/gogetter"
 )
@@ -91,5 +92,29 @@ func TestRetrierEventualSuccess(t *testing.T) {
 	}
 	if actual, expected := retryCalbackInvocationCounter, 2; actual != expected {
 		t.Errorf("Actual: %#v; Expected: %#v", actual, expected)
+	}
+}
+
+func TestRetrierRetryPause(t *testing.T) {
+	pause := 50 * time.Millisecond
+	getter := &mockGetter{failuresRemaining: 2}
+	retrier := &gogetter.Retrier{
+		Getter:     getter,
+		RetryCount: 1, // want max of 5 attempts
+		RetryCallback: func(_ error) bool {
+			return true
+		},
+		RetryPause: pause,
+	}
+
+	start := time.Now()
+	_, _ = retrier.Get("")
+	duration := time.Now().Sub(start)
+
+	if actual, expected := getter.invokedCounter, 2; actual != expected {
+		t.Errorf("Actual: %#v; Expected: %#v", actual, expected)
+	}
+	if expected := pause; duration < expected {
+		t.Errorf("Actual: %#v; Expected: %#v", duration, expected)
 	}
 }

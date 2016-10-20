@@ -1,6 +1,9 @@
 package gogetter
 
-import "net/http"
+import (
+	"net/http"
+	"time"
+)
 
 // Retrier will optionally retry queries that fail.
 //
@@ -18,6 +21,10 @@ type Retrier struct {
 	// RetryCallback is predicate function that tests whether query should be retried for a
 	// given error. Leave nil to retry all errors.
 	RetryCallback func(error) bool
+
+	// RetryPause is the amount of time to wait before retrying the query with the underlying
+	// Getter.
+	RetryPause time.Duration
 }
 
 // Get attempts the specified query, and optionally retries a specified number of times, based on
@@ -33,5 +40,8 @@ func (r *Retrier) Get(url string) (response *http.Response, err error) {
 			return
 		}
 		attempts++
+		if r.RetryPause > 0 {
+			time.Sleep(r.RetryPause)
+		}
 	}
 }
