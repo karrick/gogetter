@@ -2,8 +2,8 @@ package gogetter
 
 import "net/http"
 
-// Getter is the interface implemented by an object that provides a Get method identical to
-// http.Client's method, to allow composition of functionality.
+// Getter is very small abstraction of any type that provides a Get method with the same signature
+// of http.Client's Get method.
 type Getter interface {
 	Get(url string) (*http.Response, error)
 }
