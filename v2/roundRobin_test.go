@@ -3,7 +3,7 @@ package gogetter_test
 import (
 	"testing"
 
-	"github.com/karrick/gogetter"
+	"github.com/karrick/gogetter/v2"
 )
 
 func TestRoundRobinSingleGetter(t *testing.T) {
