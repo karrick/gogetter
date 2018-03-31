@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/karrick/gogetter/v2"
+	gogetter "github.com/karrick/gogetter/v2"
 )
 
 func TestRetrierZeroRetriesMakesOnlyOneAttempt(t *testing.T) {
